@@ -24,6 +24,9 @@ public class MasterNode {
 	private final static String MASTER_TABLE = "/tmp/MasterTable.txt";
 	private final static String SERVERS_FILE = "/tmp/Servers.txt";
 	
+	private boolean isShared = false;
+	private String usernameFrom;
+	
 	//Master node assigns unique fileDesc to each of the files in the system
 	
 	public int fileDescGenerator(){
@@ -54,13 +57,13 @@ public class MasterNode {
 		
 	}
 	
-	public int getFileDescriptor(String filename) {
+	public int getFileDescriptor(String filename, String username) {
 		// open the file and get the fd for filename
 		// File looks like this
 		/*
-		 * text1.txt 1 
-		 * text2.txt 2 
-		 * text3.txt 3
+		 * text1.txt 1 username1 created
+		 * text2.txt 2 username2 shared usernameFrom
+		 * text3.txt 3 username3 created
 		 */
 
 		File file = new File(FILE_NAME);
@@ -73,8 +76,12 @@ public class MasterNode {
 			String[] tokens;
 			while((line = br.readLine()) != null){
 				tokens = line.split(" ");
-				if(tokens[0].contentEquals(filename)){
+				if(tokens[0].contentEquals(filename) && tokens[2].contentEquals(username)){
 					fd = Integer.parseInt(tokens[1]);
+					if(tokens[3].contentEquals("shared")){
+						isShared = true;
+						usernameFrom = tokens[4];
+					}
 					break;
 				}
 			}
@@ -88,6 +95,95 @@ public class MasterNode {
 		return fd;
 	}
 	
+	public boolean isShared(){
+	
+		return isShared;
+	
+	}
+	
+	public String getUsernameFrom(){
+		
+		return usernameFrom;
+	
+	}
+	
+	public boolean doesFileExists(String filename, String username) {
+		
+		File file = new File(FILE_NAME);
+		boolean exists = false;
+		
+		try {
+			// FileInputStream is = new FileInputStream();
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			String line; // = br.readLine();
+			String[] tokens;
+			while((line = br.readLine()) != null){
+				tokens = line.split(" ");
+				if(tokens[0].contentEquals(filename) && tokens[2].contentEquals(username)){
+					exists = true;
+					break;
+				}
+			}
+			br.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return exists;
+		
+	}
+	
+	
+	public List<String> getUserFiles(String username, String type){
+		
+		// open the file and get the fd for filename
+				// File looks like this
+				/*
+				 * text1.txt 1 username1 created
+				 * text2.txt 2 usernameTo shared usernameFrom 
+				 * text3.txt 3 username3 created 
+				 */
+				
+				File file = new File(FILE_NAME);
+				List<String> userFiles = new ArrayList<String>(); 
+				
+				try {
+					// FileInputStream is = new FileInputStream();
+					BufferedReader br = new BufferedReader(new FileReader(file));
+					String line; // = br.readLine();
+					String[] tokens;
+					while((line = br.readLine()) != null){
+						tokens = line.split(" ");
+						if(tokens[2].contentEquals(username) && tokens[3].contentEquals(type)){
+							userFiles.add(tokens[0]);
+						}
+					}
+					br.close();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				return userFiles;
+		
+	}
+	
+	public int shareFile(String filename, String usernameFrom, String usernameTo) {
+		
+		/*
+		if(doesFileExists(filename, usernameTo)){
+			return 2;
+		}
+		*/
+		int fd = fileDescGenerator();
+		writeSuccessfullShare(filename, fd, "shared", usernameTo);
+		
+		return 1;
+		
+	}
 	
 	public int getPartition(int fd, String filename, String ip, int totalNumOfParts){
 		
@@ -167,7 +263,7 @@ public class MasterNode {
 		
 	}
 	
-	public void writeSuccessfull(String filename, int FD) {
+	public void writeSuccessfull(String filename, int FD, String type) {
 		
 		File sfile = new File(SEQ_FILE_NAME);
 		File file = new File(FILE_NAME);
@@ -177,7 +273,32 @@ public class MasterNode {
 			//FileOutputStream os = new FileOutputStream(sfile);
 			BufferedWriter sbw = new BufferedWriter(new FileWriter(sfile));
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file,true));
-		    String line = filename + " " + FD;
+		    String line = filename + " " + FD + " " + ApplicationInfo.userName + " " + type +"\n";
+		    bw.write(line);
+		    String seq = FD + "\n";
+		    sbw.write(seq);
+		    bw.close();
+		    sbw.close();
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void writeSuccessfullShare(String filename, int FD, String type, String username) {
+		
+		File sfile = new File(SEQ_FILE_NAME);
+		File file = new File(FILE_NAME);
+		
+		try {
+			//FileInputStream is = new FileInputStream();
+			//FileOutputStream os = new FileOutputStream(sfile);
+			BufferedWriter sbw = new BufferedWriter(new FileWriter(sfile));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file,true));
+		    String line = filename + " " + FD + " " + username + " " + type + " " + ApplicationInfo.userName + "\n";
 		    bw.write(line);
 		    String seq = FD + "\n";
 		    sbw.write(seq);
@@ -292,7 +413,7 @@ public class MasterNode {
 					e.printStackTrace();
 				}
 				
-				this.writeSuccessfull(filename, FD);
+				this.writeSuccessfull(filename, FD, "created");
 				
 	}
 	

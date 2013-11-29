@@ -20,7 +20,7 @@ public class Merge {
 				files[i - 1] = new File(fname);
 			}
 			*/
-			File outFile = new File("/tmp/Temp.txt");
+			File outFile = new File("/tmp/Temp");
 			
 			if(!outFile.exists()){
 				outFile.createNewFile();

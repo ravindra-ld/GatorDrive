@@ -97,7 +97,7 @@ public class DownloadFileServlet extends HttpServlet{
         File file = null;
         
         if(result == 1){
-        	file = new File("/tmp/Temp.txt");
+        	file = new File("/tmp/Temp");
         }
         
         // Get content type by filename.

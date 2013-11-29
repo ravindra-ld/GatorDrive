@@ -148,7 +148,7 @@ public class Client {
     
     public String executeMultiPartDeletePartitionRequest(String serverAddress, int fd, String fileName, int numOfParts, String username) {
     	
-    	String urlString = "http://"+serverAddress+":8080/GatorDrive/getPartition";
+    	String urlString = "http://"+serverAddress+":8080/GatorDrive/deletePartition";
         HttpPost postRequest = new HttpPost (urlString) ;
         try{
  

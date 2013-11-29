@@ -24,6 +24,7 @@ import com.cloud.gatordrive.client.Client;
 public class RequestHandler {
 
 	private final static String SERVER_TABLE = "/tmp/ServerTable.txt";
+	private final static String LOG_FILE = "/tmp/log.txt";
 	
 	private Split split;
 	private Merge merge;
@@ -40,8 +41,31 @@ public class RequestHandler {
 		this.username = username;
 		ApplicationInfo.userName = username;
 	}
+	
+	public List<String> getUserFiles() {
+		
+		return master.getUserFiles(username, "created");
+		
+	}
+	
+	public List<String> getSharedFiles() {
+		
+		return master.getUserFiles(username, "shared");
+		
+	}
+	
+	public int shareFile(String filename, String usernameTo) {
+		
+		return master.shareFile(filename, username, usernameTo);
+		
+	}
 
 	public int partitionFile(InputStream fis, String filename) {
+		
+		//return code 2 for same file already exists for this user
+		if(master.doesFileExists(filename, username)) {
+			return 2;
+		}
 		
 		int FD = master.fileDescGenerator();
 		
@@ -73,12 +97,16 @@ public class RequestHandler {
 	
 	public int getFile(String filename){
 		
-		int fd = master.getFileDescriptor(filename);
+		int fd = master.getFileDescriptor(filename, username);
 		int totalNumOfParts = 0;
 		
 		if(fd == 0){
 			System.out.println("File "+filename+" not found on the server");
 			return 0;
+		}
+		
+		if(master.isShared()){
+			username = master.getUsernameFrom();
 		}
 		
 		//check if the fd is in this server
@@ -258,12 +286,18 @@ public class RequestHandler {
 	
 	public int deleteFile(String filename){
 		
-		int fd = master.getFileDescriptor(filename);
+		int fd = master.getFileDescriptor(filename, username);
 		int totalNumOfParts = 0;
 		
 		if(fd == 0){
 			System.out.println("File "+filename+" not found on the server");
 			return 0;
+		}
+		
+		if(master.isShared()){
+			//shared file deletion is super fast
+			master.deleteEntry(fd);
+			return 1;
 		}
 		
 		//check if the fd is in this server
@@ -552,7 +586,7 @@ public class RequestHandler {
 		int count = 0;
 		int result;
 		
-		System.out.println("AAAA");
+		StringBuilder sb = new StringBuilder();
 		
 		//distribute orgPartitions
 		for(i = 0; i < serverList.size(); i++){
@@ -562,12 +596,16 @@ public class RequestHandler {
 				result = client.sendPartition(fd, serverList.get(i),orgPartitions[j],j+1,num, username);
 				if(result == 1){
 					System.out.println("Storing Original partition "+(j+1)+" on "+serverList.get(i)+" success");
+					sb.append("Storing Original partition "+(j+1)+" on "+serverList.get(i)+" success");
+					sb.append("\n");
 					//update master table
 					if(!orgServerList.contains(serverList.get(i))){
 						orgServerList.add(serverList.get(i));
 					}
 				}else{
 					System.out.println("Storing Original partition "+(j+1)+" on "+serverList.get(i)+" failed");
+					sb.append("Storing Original partition "+(j+1)+" on "+serverList.get(i)+" failed");
+					sb.append("\n");
 				}
 			}
 		}
@@ -576,11 +614,15 @@ public class RequestHandler {
 			result = client.sendPartition(fd, serverList.get(i-1),orgPartitions[j],j+1,num, username);
 			if(result == 1){
 				System.out.println("Storing Original partition "+(j+1)+" on "+serverList.get(i-1)+" success");
+				sb.append("Storing Original partition "+(j+1)+" on "+serverList.get(i-1)+" success");
+				sb.append("\n");
 				if(!orgServerList.contains(serverList.get(i-1))){
 					orgServerList.add(serverList.get(i-1));
 				}
 			}else{
 				System.out.println("Storing Original partition "+(j+1)+" on "+serverList.get(i-1)+" failed");
+				sb.append("Storing Original partition "+(j+1)+" on "+serverList.get(i-1)+" failed");
+				sb.append("\n");
 			}
 		}
 		
@@ -595,12 +637,16 @@ public class RequestHandler {
 				result = client.sendPartition(fd, serverList.get(i),repPartitions[j],j+1,num, username);
 				if(result == 1){
 					System.out.println("Storing replicated partition "+(j+1)+" on "+serverList.get(i)+" success");
+					sb.append("Storing replicated partition "+(j+1)+" on "+serverList.get(i)+" success");
+					sb.append("\n");
 					//update master table
 					if(!repServerList.contains(serverList.get(i))){
 						repServerList.add(serverList.get(i));
 					}
 				}else{
 					System.out.println("Storing replicated partition "+(j+1)+" on "+serverList.get(i)+" failed");
+					sb.append("Storing replicated partition "+(j+1)+" on "+serverList.get(i)+" failed");
+					sb.append("\n");
 				}
 			}
 		}
@@ -611,15 +657,28 @@ public class RequestHandler {
 			result = client.sendPartition(fd, serverList.get(i+1),repPartitions[j],j+1,num, username);
 			if(result == 1){
 				System.out.println("Storing replicated partition "+(j+1)+" on "+serverList.get(i+1)+" success");
+				sb.append("Storing replicated partition "+(j+1)+" on "+serverList.get(i+1)+" success");
+				sb.append("\n");
 				if(!repServerList.contains(serverList.get(i+1))){
 					repServerList.add(serverList.get(i+1));
 				}
 			}else{
 				System.out.println("Storing replicated partition "+(j+1)+" on "+serverList.get(i+1)+" failed");
+				sb.append("Storing replicated partition "+(j+1)+" on "+serverList.get(i+1)+" failed");
+				sb.append("\n");
 			}
 		}
 		
 		master.addEntry(fd, filename, orgServerList, repServerList);
+		File file = new File(LOG_FILE);
+		try{
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write(sb.toString());
+			bw.close();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		
 		return 1;
 	}
 
