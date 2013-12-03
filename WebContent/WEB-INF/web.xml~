@@ -60,7 +60,7 @@
   	</servlet>
   	<servlet>
     	<servlet-name>Share</servlet-name>
-    	<servlet-class>com.cloud.gatordrive.servlet.FileShareServlet</servlet-class>
+    	<servlet-class>com.cloud.gatordrive.servlet.ShareFileServlet</servlet-class>
   	</servlet>
   	<servlet>
     	<servlet-name>DownloadController</servlet-name>

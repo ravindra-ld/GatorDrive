@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.cloud.gatordrive.ApplicationInfo;
+
 public class DownloadController extends HttpServlet {
 	static final long serialVersionUID = 1L;
 	int offset;
@@ -20,14 +22,17 @@ public class DownloadController extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 
 	
-		String filename = request.getParameter("filename");
+		String filename = request.getParameter("fileName");
 		
 		HttpSession httpSession = request.getSession();
-		httpSession.setAttribute("username", "gators");
+		
+		String username = ApplicationInfo.userName; // (String) httpSession.getAttribute("username");
+		
+		httpSession.setAttribute("username",  username/*"gators"*/);
 		
 		DownLoadFile df = new DownLoadFile();
 		
-		df.downloadFile(filename);
+		df.downloadFile(filename, username);
 		
 		
 		RequestDispatcher dispatcher = request

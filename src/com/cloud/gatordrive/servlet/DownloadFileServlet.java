@@ -13,7 +13,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import com.cloud.gatordrive.ApplicationInfo;
 import com.cloud.gatordrive.RequestHandler;
 
 public class DownloadFileServlet extends HttpServlet{
@@ -86,8 +88,9 @@ public class DownloadFileServlet extends HttpServlet{
         	//redirect to login page
         }
         */
-        //just for testing
-        username = "gators";
+        
+        HttpSession session = request.getSession();
+        username = ApplicationInfo.userName; // (String) session.getAttribute("username"); // "gators";
         
         RequestHandler reqHandler = new RequestHandler(username);
         

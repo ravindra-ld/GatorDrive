@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.cloud.gatordrive.ApplicationInfo;
 import com.cloud.gatordrive.Client.StudentDetailsDTO;
 
 /**
@@ -57,7 +58,7 @@ public class Controller extends HttpServlet {
 		httpSession.setAttribute("pages", getPages());
 		//httpSession.setAttribute("studentDetails", getListByOffsetAndLength());
 		httpSession.setAttribute("type", "created");
-		httpSession.setAttribute("username", "gators");
+		httpSession.setAttribute("username", ApplicationInfo.userName);
 		RequestDispatcher dispatcher = request
 				.getRequestDispatcher("Home2.jsp");
 		dispatcher.forward(request, response);

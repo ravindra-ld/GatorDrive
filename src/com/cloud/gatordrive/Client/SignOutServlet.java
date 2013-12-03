@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.cloud.gatordrive.ApplicationInfo;
+
 public class SignOutServlet extends HttpServlet {
 	static final long serialVersionUID = 1L;
 	
@@ -19,7 +21,7 @@ public class SignOutServlet extends HttpServlet {
 		HttpSession httpSession = request.getSession();
 
 		httpSession.setAttribute("username", null);
-		
+		ApplicationInfo.userName = "";
 		RequestDispatcher dispatcher = request
 				.getRequestDispatcher("Home2.jsp");
 		dispatcher.forward(request, response);

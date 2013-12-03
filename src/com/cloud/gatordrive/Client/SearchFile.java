@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.cloud.gatordrive.ApplicationInfo;
 import com.cloud.gatordrive.RequestHandler;
 
 public class SearchFile extends HttpServlet {
@@ -23,12 +24,13 @@ public class SearchFile extends HttpServlet {
 		//httpSession.setAttribute("studentDetails", getListByOffsetAndLength());
 		String filename = request.getParameter("filename");
 		
-		String username = "gators";
+		String username = ApplicationInfo.userName; // "gators";
 		RequestHandler reqHandler = new RequestHandler(username);
 		List<String> files = reqHandler.searchUserFiles(filename);
 		
 		httpSession.setAttribute("type", "search");
-		httpSession.setAttribute("username", "gators");
+		
+		httpSession.setAttribute("username", ApplicationInfo.userName);
 		//System.out.println("Files = "+files.toString());
 		response.getWriter().write(files.toString());
 		request.setAttribute("files", files.toString());

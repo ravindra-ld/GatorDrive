@@ -12,6 +12,7 @@
 File: <input type="file" name="file" id="file" /> <br/>
 <input type="submit" />
 </form>
+<a href = "Home2.jsp">Back</a>
 </body>
 
 </html>

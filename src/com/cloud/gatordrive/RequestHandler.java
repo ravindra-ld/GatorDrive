@@ -530,7 +530,8 @@ public class RequestHandler {
 		// ApplicationInfo.map.put(partitionNumber, is);
 
 		System.out.println("FilePart = " + filePartition);
-
+		System.out.println("NoOfParts = " + numOfParts);
+		
 		if (file.exists()) {
 			file.delete();
 			COUNT++;

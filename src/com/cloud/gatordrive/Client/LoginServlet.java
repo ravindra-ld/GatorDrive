@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.cloud.gatordrive.ApplicationInfo;
 import com.cloud.gatordrive.db.DBConnectionManager;
 
 public class LoginServlet extends HttpServlet {
@@ -62,6 +63,8 @@ public class LoginServlet extends HttpServlet {
 				HttpSession session = request.getSession();
 				session.setAttribute("User", user);
 				session.setAttribute("username", user.getName());
+				ApplicationInfo.userName = user.getName();
+				session.setAttribute("type", "created");
 				//response.sendRedirect("Home2.jsp");;
 				//RequestDispatcher dispatcher = request
 				//		.getRequestDispatcher("Home2.jsp");
@@ -78,8 +81,13 @@ public class LoginServlet extends HttpServlet {
 				}
 				dispatcher.forward(request, response);
 				*/
+				/*
 				RequestDispatcher rd = getServletContext().getRequestDispatcher("/Home2.jsp");
 				rd.include(request, response);
+				*/
+				RequestDispatcher dispatcher = request
+						.getRequestDispatcher("Home2.jsp");
+				dispatcher.forward(request, response);
 			}else{
 				RequestDispatcher rd = getServletContext().getRequestDispatcher("/index.jsp");
 				PrintWriter out= response.getWriter();

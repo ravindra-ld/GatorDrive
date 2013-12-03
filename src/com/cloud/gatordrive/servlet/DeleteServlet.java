@@ -15,6 +15,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUpload;
 import org.json.JSONObject;
 
+import com.cloud.gatordrive.ApplicationInfo;
 import com.cloud.gatordrive.RequestHandler;
 
 public class DeleteServlet  extends HttpServlet {
@@ -73,13 +74,14 @@ public class DeleteServlet  extends HttpServlet {
 			}
 			*/
 			
-			filename = req.getParameter("filename");
+			filename = req.getParameter("fileName");
 			
 			//String files = req.getParameter("filename");
 			
 			System.out.println("filename = "+filename);
 			
-			username = "gators";
+			HttpSession session = req.getSession();
+	        username = ApplicationInfo.userName; // (String) session.getAttribute("username");
 			
 			RequestHandler reqHandler = new RequestHandler(username);
 			
@@ -96,7 +98,7 @@ public class DeleteServlet  extends HttpServlet {
             }
 			*/
 			HttpSession httpSession = req.getSession();
-			httpSession.setAttribute("username", "gators");
+			httpSession.setAttribute("username", username);
 			RequestDispatcher dispatcher = req
 					.getRequestDispatcher("Home2.jsp");
 			dispatcher.forward(req, res);

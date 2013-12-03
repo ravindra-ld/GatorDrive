@@ -11,9 +11,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import javax.servlet.http.HttpSession;
+
 public class DownLoadFile {
 	
-	public void downloadFile(String filename){
+	public void downloadFile(String filename, String username){
 		Frame myFrame = new Frame();
 		try {
 

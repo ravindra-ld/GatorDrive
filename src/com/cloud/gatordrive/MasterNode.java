@@ -318,7 +318,7 @@ public class MasterNode {
 		}catch(IOException e){
 			e.printStackTrace();
 		}
-		
+		System.out.println("count = "+count);
 		if(count == (2 * totalNumOfParts)){
 			return 1;
 		}else{
@@ -363,7 +363,7 @@ public class MasterNode {
 			StringBuilder sb = new StringBuilder();
 			String[] tokens;
 			while((line = br.readLine()) != null){
-				tokens = line.split("\t");
+				tokens = line.split(" ");
 				int fd = Integer.parseInt(tokens[1]);
 				if(fd == FD){
 					//don't add this line
@@ -501,6 +501,7 @@ public class MasterNode {
 					
 					String data = sb.toString();
 					data = data.substring(0, data.length() -1);
+					data = data + "\n";
 					bw.write(data);
 					
 				    bw.close();
