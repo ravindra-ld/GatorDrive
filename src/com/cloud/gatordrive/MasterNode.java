@@ -171,6 +171,42 @@ public class MasterNode {
 		
 	}
 	
+	//this function does substring matching also
+	public List<String> searchUserFiles(String username, String filename){
+		
+		// open the file and get the fd for filename
+				// File looks like this
+				/*
+				 * text1.txt 1 username1 created
+				 * text2.txt 2 usernameTo shared usernameFrom 
+				 * text3.txt 3 username3 created 
+				 */
+				
+				File file = new File(FILE_NAME);
+				List<String> userFiles = new ArrayList<String>(); 
+				
+				try {
+					// FileInputStream is = new FileInputStream();
+					BufferedReader br = new BufferedReader(new FileReader(file));
+					String line; // = br.readLine();
+					String[] tokens;
+					while((line = br.readLine()) != null){
+						tokens = line.split(" ");
+						if(tokens[2].contentEquals(username) && tokens[0].contains(filename)){
+							userFiles.add(tokens[0]);
+						}
+					}
+					br.close();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				return userFiles;
+		
+	}
+	
 	public int shareFile(String filename, String usernameFrom, String usernameTo) {
 		
 		/*
@@ -215,6 +251,19 @@ public class MasterNode {
 			
 		}
 		
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("\n");
+		sb.append("********************END RECORD******************\n");
+		File file1 = new File("/tmp/log.txt");
+		try{
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file1, true));
+			bw.write(sb.toString());
+			bw.close();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		
 		return 1;
 		
 	}
@@ -257,6 +306,18 @@ public class MasterNode {
 		
 		//remove entry from Mapper File
 		this.deleteSuccessfull(fd);
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("\n");
+		sb.append("********************END RECORD******************\n");
+		File file1 = new File("/tmp/log.txt");
+		try{
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file1, true));
+			bw.write(sb.toString());
+			bw.close();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 		
 		if(count == (2 * totalNumOfParts)){
 			return 1;

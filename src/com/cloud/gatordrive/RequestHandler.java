@@ -59,6 +59,12 @@ public class RequestHandler {
 		return master.shareFile(filename, username, usernameTo);
 		
 	}
+	
+	public List<String> searchUserFiles(String filename) {
+		
+		return master.searchUserFiles(username,filename);
+		
+	}
 
 	public int partitionFile(InputStream fis, String filename) {
 		
@@ -158,6 +164,10 @@ public class RequestHandler {
 		int numOfParts = tokens1.length;
 		// File[] fileParts = new File[numOfParts];
 		int result = 0;
+		StringBuilder sb = new StringBuilder();
+		sb.append("\n*********************START RECORD*******************\n");
+		sb.append("****************** OPERATION : READ *******************\n"); 
+		
 		for (String s : tokens1) {
 			String[] tokens2 = s.split(",");
 			if (tokens2[1].contentEquals("O")) {
@@ -177,12 +187,23 @@ public class RequestHandler {
 				}
 				result = this.addPartition(fd, cfile.getName(), is, partitionNum,
 						totalNumOfParts);
+				sb.append("Read Original partition "+ partitionNum + "from localhost successfully");
+				sb.append("\n");
 				//count++;
 			} else {
 
 			}
 		}
-
+		
+		File file = new File(LOG_FILE);
+		try{
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
+			bw.write(sb.toString());
+			bw.close();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		
 		return result;
 
 	}
@@ -191,6 +212,9 @@ public class RequestHandler {
 
 		File file = new File(SERVER_TABLE);
 		// boolean updated = false;
+		StringBuilder sb = new StringBuilder();
+		int count = 0;
+		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 
@@ -209,7 +233,7 @@ public class RequestHandler {
 					// partitions will be of the format 1,O 2,O 0,R
 					int numOfParts = tokens1.length;
 					// File[] fileParts = new File[numOfParts];
-					int count = 0;
+					//int count = 0;
 					int result;
 					for (String s : tokens1) {
 						String[] tokens2 = s.split(",");
@@ -234,10 +258,16 @@ public class RequestHandler {
 								System.out
 										.println("Successfully sent the partition "
 												+ partitionNum + " to " + ip);
+								sb.append("Successfully sent the partition "
+												+ partitionNum + " to " + ip);
+								sb.append("\n");
 							} else {
 								System.out
 										.println("Failed to send the partition "
 												+ partitionNum + " to " + ip);
+								sb.append("Failed to send the partition "
+										+ partitionNum + " to " + ip);
+								sb.append("\n");
 							}
 
 							count++;
@@ -252,7 +282,17 @@ public class RequestHandler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return 0;
+		
+		File file1 = new File(LOG_FILE);
+		try{
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file1, true));
+			bw.write(sb.toString());
+			bw.close();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		
+		return count;
 		/*
 		 * if(count == totalNumOfParts){ return 1; }else{ return
 		 * master.getFile(filename); }
@@ -350,6 +390,10 @@ public class RequestHandler {
 		int numOfParts = tokens1.length;
 		// File[] fileParts = new File[numOfParts];
 		int result = 0;
+		StringBuilder sb = new StringBuilder();
+		sb.append("\n*********************START RECORD*******************\n");
+		sb.append("****************** OPERATION : DELETE *******************\n");
+		
 		for (String s : tokens1) {
 			String[] tokens2 = s.split(",");
 			if (tokens2[1].contentEquals("O")) {
@@ -363,6 +407,8 @@ public class RequestHandler {
 
 				result = this.removePartition(fd, cfile.getName(), cfile,
 						totalNumOfParts);
+				sb.append("Deleted Original partition "+ partitionNum + " from localhost successfully");
+				sb.append("\n");
 				//count++;
 			} else {
 				int partitionNum = Integer.parseInt(tokens2[0]);
@@ -374,11 +420,22 @@ public class RequestHandler {
 
 				result = this.removePartition(fd, cfile.getName(), cfile,
 						totalNumOfParts);
+				sb.append("Deleted Replicated partition "+ partitionNum + " from localhost successfully");
+				sb.append("\n");
 			}
 		}
 		
 		//remove entry from server table
 		this.deleteEntry(fd);
+		
+		File file1 = new File(LOG_FILE);
+		try{
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file1, true));
+			bw.write(sb.toString());
+			bw.close();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 		
 		return result;
 
@@ -389,6 +446,7 @@ public class RequestHandler {
 
 		File file = new File(SERVER_TABLE);
 		int result = 0;
+		StringBuilder sb = new StringBuilder();
 		// boolean updated = false;
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
@@ -422,7 +480,8 @@ public class RequestHandler {
 							File cfile = new File(path);
 							
 							result = this.removePartition(fd, cfile.getName(), cfile, numOfParts);
-
+							sb.append("Deleted Original partition "+ partitionNum + " from "+ApplicationInfo.IP_ADDRESS +" successfully");
+							sb.append("\n");
 						} else {
 							// retrive the partition
 							int partitionNum = Integer.parseInt(tokens2[0]);
@@ -434,6 +493,8 @@ public class RequestHandler {
 							File cfile = new File(path);
 							
 							result = this.removePartition(fd, cfile.getName(), cfile, numOfParts);
+							sb.append("Deleted Replicated partition "+ partitionNum + " from "+ApplicationInfo.IP_ADDRESS +" successfully");
+							sb.append("\n");
 						}
 					}
 				}
@@ -446,6 +507,16 @@ public class RequestHandler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		File file1 = new File(LOG_FILE);
+		try{
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file1, true));
+			bw.write(sb.toString());
+			bw.close();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+
 		return result;
 	}
 	
@@ -589,6 +660,9 @@ public class RequestHandler {
 		
 		StringBuilder sb = new StringBuilder();
 		
+		sb.append("\n*********************START RECORD*******************\n");
+		sb.append("****************** OPERATION : WRITE *******************\n"); 
+		
 		//distribute orgPartitions
 		for(i = 0; i < serverList.size(); i++){
 			int high = count + perServer;
@@ -666,14 +740,15 @@ public class RequestHandler {
 			}else{
 				System.out.println("Storing replicated partition "+(j+1)+" on "+serverList.get(i+1)+" failed");
 				sb.append("Storing replicated partition "+(j+1)+" on "+serverList.get(i+1)+" failed");
-				sb.append("\n");
+				sb.append("\n\n");
+				sb.append("********************END RECORD******************\n");
 			}
 		}
 		
 		master.addEntry(fd, filename, orgServerList, repServerList);
 		File file = new File(LOG_FILE);
 		try{
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
 			bw.write(sb.toString());
 			bw.close();
 		}catch(IOException e){

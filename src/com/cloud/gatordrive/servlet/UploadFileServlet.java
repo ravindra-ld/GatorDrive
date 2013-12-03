@@ -92,6 +92,7 @@ public class UploadFileServlet extends HttpServlet {
                                         //getServletContext().getRealPath("/tmp/")+cfile.getName());
                                         //cfile.getName());
                         */
+						
 						String data = item.getString();
 						BufferedWriter bw = new BufferedWriter(new FileWriter(new File("/tmp/"+fname)));
                         bw.write(data);
@@ -100,6 +101,8 @@ public class UploadFileServlet extends HttpServlet {
                         is = new FileInputStream(cfile);  
 			       
                         int success = 0;
+                        
+                        System.out.println("file = "+fname);
                         
                         if(is != null){
                                 RequestHandler reqHandler = new RequestHandler(username);
@@ -111,13 +114,14 @@ public class UploadFileServlet extends HttpServlet {
                                 		success = reqHandler.storePartition(fd, cfile.getName(), is, partitionNumber, numOfParts);
                                 	}             
                                 }else {
-                                        reqHandler.partitionFile(is, cfile.getName());
+                                		
+                                        success = reqHandler.partitionFile(is, cfile.getName());
                                 }
                         }else{
                                 System.out.println("InputStream was null");
                         }
                         
-                        if(fd != 0){
+                        //if(fd != 0){
                                 res.setContentType("text/plain");
                                 try {
                                         JSONObject json = new JSONObject();
@@ -127,7 +131,7 @@ public class UploadFileServlet extends HttpServlet {
                                 } catch (IOException e1) {
                                         e1.printStackTrace();
                                 }
-                        }
+                        //}
 					}
 				} else {
 					

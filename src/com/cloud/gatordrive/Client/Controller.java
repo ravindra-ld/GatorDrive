@@ -48,7 +48,7 @@ public class Controller extends HttpServlet {
 		//if login fails, show error message
 		
 		
-		//if login succeeds, got get userfiles and go to home2.jsp
+		//if login succeeds, get userfiles and go to home2.jsp
 		
 		int offset = maxEntriesPerPage * (page - 1);
 		TestList(offset, maxEntriesPerPage);	

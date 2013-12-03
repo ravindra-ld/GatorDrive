@@ -12,6 +12,24 @@
 		<welcome-file>default.htm</welcome-file>
 		<welcome-file>default.jsp</welcome-file>
 	</welcome-file-list>
+	
+	<context-param>
+    <param-name>dbUser</param-name>
+    <param-value>root</param-value>
+  </context-param>
+  <context-param>
+    <param-name>dbPassword</param-name>
+    <param-value>abcd@1234</param-value>
+  </context-param>
+  <context-param>
+    <param-name>dbURL</param-name>
+    <param-value>jdbc:mysql://localhost:3306/gatordrive</param-value>
+  </context-param>
+  <context-param>
+    <param-name>log4j-config</param-name>
+    <param-value>WEB-INF/log4j.xml</param-value>
+  </context-param>
+  
 	<servlet>
 		<servlet-name>Upload</servlet-name>
 		<servlet-class>com.cloud.gatordrive.servlet.UploadFileServlet</servlet-class>
@@ -45,10 +63,38 @@
     	<servlet-class>com.cloud.gatordrive.Client.Controller2</servlet-class>
   	</servlet>
   	<servlet>
+    	<servlet-name>Share</servlet-name>
+    	<servlet-class>com.cloud.gatordrive.servlet.ShareFileServlet</servlet-class>
+  	</servlet>
+  	<servlet>
     	<servlet-name>DownloadController</servlet-name>
     	<servlet-class>com.cloud.gatordrive.Client.DownloadController</servlet-class>
   	</servlet>
+  	<servlet>
+    	<servlet-name>Search</servlet-name>
+    	<servlet-class>com.cloud.gatordrive.Client.SearchFile</servlet-class>
+  	</servlet>
+  	<servlet>
+    	<servlet-name>Register</servlet-name>
+    	<servlet-class>com.cloud.gatordrive.Client.RegisterServlet</servlet-class>
+  	</servlet>
+  	<servlet>
+    	<servlet-name>SignIn</servlet-name>
+    	<servlet-class>com.cloud.gatordrive.Client.LoginServlet</servlet-class>
+  	</servlet>
+  	<servlet>
+    	<servlet-name>SignOut</servlet-name>
+    	<servlet-class>com.cloud.gatordrive.Client.SignOutServlet</servlet-class>
+  	</servlet>
 
+	<servlet-mapping>
+    	<servlet-name>Register</servlet-name>
+    	<url-pattern>/Register/*</url-pattern>
+  	</servlet-mapping>
+  	<servlet-mapping>
+    	<servlet-name>SignIn</servlet-name>
+    	<url-pattern>/SignIn/*</url-pattern>
+  	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>Upload</servlet-name>
 		<url-pattern>/upload/*</url-pattern>
@@ -82,9 +128,22 @@
     	<url-pattern>/Controller2</url-pattern>
   	</servlet-mapping>
   	<servlet-mapping>
+    	<servlet-name>Share</servlet-name>
+    	<url-pattern>/Share/*</url-pattern>
+  	</servlet-mapping>
+  	<servlet-mapping>
     	<servlet-name>DownloadController</servlet-name>
     	<url-pattern>/downloadController/*</url-pattern>
   	</servlet-mapping>
+  	<servlet-mapping>
+    	<servlet-name>Search</servlet-name>
+    	<url-pattern>/Search/*</url-pattern>
+  	</servlet-mapping>
+  	<servlet-mapping>
+    	<servlet-name>SignOut</servlet-name>
+    	<url-pattern>/SignOut/*</url-pattern>
+  	</servlet-mapping>
+  	
 	
 	
 </web-app>

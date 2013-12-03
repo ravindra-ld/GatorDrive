@@ -1,9 +1,12 @@
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.io.OutputStream"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@page import="java.util.List"%>
 <%@page
 	import="com.cloud.gatordrive.Client.StudentDetailsDTO"
-	import="com.cloud.gatordrive.Client.GetFiles" %>
+	import="com.cloud.gatordrive.Client.GetFiles"
+	import="com.cloud.gatordrive.Client.MyHttpServletResponseWrapper" %>
 	
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -58,7 +61,7 @@ $(document).ready(function() {
 <div id="header_rightpane"  align="center" style="font-size: 12; color: gray;">
 <table>
 <tr> <td> Username </td>
- <td> <a href="#"> Sign out </a> </td> </tr>
+ <td> <a href="/GatorDrive/SignOut"> Sign out </a> </td> </tr>
 </table>
 </div>
 </div>
@@ -73,7 +76,7 @@ $(document).ready(function() {
 <td> <a href="#"> <img src="ShareSmall.png" /> </a> </td>
 <td> <a href="/GatorDrive/deleteFile?filename=a.txt"> <img src="DeleteSmall.png" /> </a> </td>
 <td> <input type="text" name="search" title="search" style="color:#888;" value="Search" onfocus="inputFocus(this)" onblur="inputBlur(this)" /> </td>
-<td> <a href="#"> <img src="SearchSmall.png" /> </a> </td>
+<td> <a href="/GatorDrive/Search?filename=xy"> <img src="SearchSmall.png" /> </a> </td>
 </tr>
 </table>
 </div>
@@ -89,18 +92,51 @@ $(document).ready(function() {
    
    <h1>Pagination In Servlets</h1>
 
+<!--
+<script type="text/javascript">
+	window.location = "http://localhost:8080/GatorDrive/index.jsp";
+</script>
+-->
+
+<%
+	String username = (String) session.getAttribute("username");
+	if(username == null){
+%>
+  <jsp:forward page="index.jsp"></jsp:forward>	
+<%
+	}
+%>
+
 <%
 	//List list = (List) session.getAttribute("studentDetails");
 	GetFiles gf = new GetFiles();
 	
 	String type = (String) session.getAttribute("type");
-	String username = (String) session.getAttribute("username");
+	username = (String) session.getAttribute("username");
 	
-	List<String> list;
+	List<String> list = null;
 	if(type != null && type.contentEquals("shared")){
 		list = gf.getSharedFiles(username);
-	}else{
+	}else if(type != null && type.contentEquals("created")){
 		list = gf.getCreatedFiles(username);
+	}else if(type != null && type.contentEquals("search")){
+		/*
+		HttpServletResponse httpResponse = (HttpServletResponse) response;
+		MyHttpServletResponseWrapper wrapper = 
+		  new MyHttpServletResponseWrapper(httpResponse);
+		String content = wrapper.toString();
+		*/
+		String content = (String) request.getAttribute("files");
+		//out.println("CONTENT = "+content);
+		content = content.replace("[", "");
+		content = content.replace("]", "");
+		String[] files = content.split(",");
+		List<String> List = new ArrayList<String>();
+		for(String file : files){
+			List.add(file);
+		}
+		list = List;
+		
 	}
 	
 	

@@ -36,7 +36,7 @@ function inputBlur(i){
 </div>
 
 <div id="header_rightpane"  align="center">
-	<form name="LoginForm" action="Controller" onsubmit="return validateForm();" method="get">
+	<form name="LoginForm" action="SignIn" onsubmit="return validateForm();" method="post">
 		<table>
 			<tr>
 				<td>
@@ -61,7 +61,7 @@ function inputBlur(i){
 
 <div id="contentcolumn">
 <div class="innertube">
-<form name="RegisterForm" action="#" onsubmit="return validateRegisterForm();" method="post">
+<form name="RegisterForm" action="Register" onsubmit="return validateRegisterForm();" method="post">
 		<p > <b> Sign Up </b> </p>
 		
 		<table>
